@@ -2,7 +2,7 @@
 
 .spa-shell-head, .spa-shell-head-logo, .spa-shell-head-acct,
 	.spa-shell-head-search, .spa-shell-main, .spa-shell-main-nav,
-	.spa-shell-main-content, .spa-shell-foot, .spa-shell-chat,
+	.spa-shell-main-content, .spa-shell-foot, /* .spa-shell-chat, */
 	.spa-shell-modal {
 	position: absolute;
 }
@@ -77,6 +77,7 @@
 	height: 40px;
 }
 
+/* spa.chat.cssへ移動
 .spa-shell-chat {
 	bottom: 0;
 	right: 0;
@@ -90,7 +91,7 @@
 
 .spa-shell-chat:hover{
 	background: #a00;
-}
+} */
 
 .spa-shell-modal {
 	margin-top: -200px;
@@ -101,4 +102,6 @@
 	height: 400px;
 	background: #fff;
 	z-index: 2;
+	
+	display:none; /* チャットウィンドウの動作確認のため一時的に表示を切る*/
 }

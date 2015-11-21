@@ -12,14 +12,13 @@
 /*global $, spa:true */
 
 var spa = (function() {
-    /**
-     * パブリックメソッド
-     * 初期状態を設定し機能を提供する。
-     */
-    var initModule = function($container) {
-	spa.shell.initModule($container);
-    };
-
-    //パブリックメソッドのエクスポート
-    return {initModule : initModule};
+  /**
+   * パブリックメソッド
+   * 初期状態を設定し機能を提供する。
+   */
+  var initModule = function($container) {
+    spa.shell.initModule($container);
+  };
+  //パブリックメソッドのエクスポート
+  return {initModule : initModule};
 }());

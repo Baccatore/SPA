@@ -37,14 +37,14 @@ spa.util = (function() {
 	setConfigMap = function ( arg_map ){
 		var
 			input_map = arg_map.input_map,
-			sttable_map = arg_map.settable_map,
+			settable_map = arg_map.settable_map,
 			config_map = arg_map.config_map,
 			keyname, error;
 		
 		for ( key_name in input_map ){
-			if(infput_map.hasOwnProperty( key_name ) ){
+			if(input_map.hasOwnProperty( key_name ) ){
 		 		if( settable_map.hasOwnProperty( key_name ) ){
-					config_map[key_map] = input_map[key_map];
+					config_map[key_name] = input_map[key_name];
 				} else {
 					error = nakeError( 'Bad Input',
 						'Setting config key |' + key_name + '| is not supported');
