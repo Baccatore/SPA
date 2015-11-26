@@ -65,7 +65,7 @@ spa.chat = (function(){
         slider_opened_px  : 0
       },
 			jqueryMap = {},
-			setJqueryMap, getEnSize, setPxSizes, setSliderPosition,
+			setJqueryMap, getEmSize, setPxSizes, setSliderPosition,
 			onClickToggle, configModule, initModule
 	;
   //--モジュールスコープ変数終了---------------------------------------------------
@@ -73,9 +73,9 @@ spa.chat = (function(){
   //--ユーティリティメソッド開始---------------------------------------------------
   getEmSize = function ( elem ){
     return Number(
-        getComputedStyle( elem, '' ).fontSize.match(/\d*\.>\d*/)[0]
+        getComputedStyle( elem, '' ).fontSize.match(/\d*\.?\d*/)[0]
     );
-  }
+  };
   //--ユーティリティメソッド終了---------------------------------------------------
 
 	//--DOMメソッド開始-----------------------------------------------------------
@@ -96,21 +96,18 @@ spa.chat = (function(){
 				};
 	};
 	/**
-	 * @classdex this is my class
-	 * @constructor 
 	 * そんなん言うけどちゃんと機能せえへんやんけ
 	 */
 	setPxSizes = function () {
 	  var px_per_em, opened_height_em;
-	    px_per_em = getEmSize( jqueryMap.$slider_get(0) );
-	    
+	    px_per_em = getEmSize( jqueryMap.$slider.get(0) );
 	    opened_height_em = configMap.slider_opened_em;
 	    
 	    stateMap.px_per_em = px_per_em;
 	    stateMap.slider_closed_px = configMap.slider_closed_em * px_per_em;
 	    stateMap.slider_opened_px = opened_height_em * px_per_em;
 	    jqueryMap.$sizer.css({
-	      height : ( opened_height_em -2 ) * px_per_em
+	      height : ( opened_height_em - 2 ) * px_per_em
 	    });
 	};
 	//--DOMメソッド終了-----------------------------------------------------------
@@ -133,11 +130,10 @@ spa.chat = (function(){
 	setSliderPosition = function ( position_type, callback ) {
 	  var
 	    height_px, animate_time, slider_title, toggle_text;
-	  
 	  //スライダーがすでに要求された位置にある場合はtrueを返す
 	  if ( stateMap.positioin_type === position_type){
 	    return true;
-	  }
+	  };
 	  
 	  //アニメーションパラメータを用意する
 	  switch ( position_type ){
@@ -147,14 +143,12 @@ spa.chat = (function(){
 	    slider_title = configMap.slider_opened_title;
 	    toggle_text = '=';
 	  break;
-	  
 	  case 'hidden' :
 	    height_px = 0;
 	    animate_time = configMap.slider_opem_time;
 	    slider_title = '';
 	    toggle_text = '+';
     break;
-    
 	  case 'closed' :
 	    height_px = stateMap.slider_closed_px;
 	    animate_time = configMap.slider_close_time;
@@ -165,15 +159,16 @@ spa.chat = (function(){
 	  }
 	  stateMap.position_type = '';
 	  jqueryMap.$slider.animate(
-	    {heght: height_px},
+	    { height: height_px },
 	    animate_time,
 	    function (){
 	      jqueryMap.$toggle.prop( 'title', slider_title );
 	      jqueryMap.$toggle.text( toggle_text );
 	      stateMap.position_type = position_type;
-	      if( callback ){ callback( jqueryMap.$slider); }
+	      if( callback ){ callback( jqueryMap.$slider ); }
 	    }
 	  );
+	  return true;
 	};
 	//--パブリックイベント終了------------------------------------------------------
 	
@@ -189,7 +184,7 @@ spa.chat = (function(){
 	};
 	//--イベントハンドラ終了--------------------------------------------------------
 	
-	//--イベントハンドラ開始--------------------------------------------------------
+	//--パブリックメソッド開始--------------------------------------------------------
   /**
    * configModule
    * 用例: spa.chat.configModule({slider_open_em : 18});
@@ -242,7 +237,7 @@ spa.chat = (function(){
 		$append_target.append( configMap.main_html );
 		stateMap.$append_target = $append_target;
 		setJqueryMap();
-		setPxSizes;
+		setPxSizes();
 		
 		//チャットスライダーの初期化
 		jqueryMap.$toggle.prop( 'title', configMap.slider_closed_title );
@@ -250,8 +245,8 @@ spa.chat = (function(){
 		stateMap.position_type = 'closed';
 		
 		return true;
-	}
-	//--パブリックイベント終了------------------------------------------------------
+	};
+	//--パブリックメソッド終了------------------------------------------------------
 	
 	return{
 	  setSliderPosition : setSliderPosition,

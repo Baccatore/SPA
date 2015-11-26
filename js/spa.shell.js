@@ -16,58 +16,45 @@
 
 /** global $, saa */
 spa.shell = (function() {
-  /**
-   * モジュール変数宣言
-   */
+  //--モジュール変数宣言-------------------------------------------------------
   var
-    /**
-     * 静的構成値.
-     * こうした値は最終的にはXMLでマッピングする
-     * なんでjsdocで見れなんだ？
-     */
     configMap = {
-    anchor_shema_map : {
-      chat : { opened : true, closed : false }
-    },
-    main_html : String()
-      + '<div class="spa-shell-head">'
-        + '<div class="spa-shell-head-logo"></div>'
-        + '<div class="spa-shell-head-acct"></div>'
-        + '<div class="spa-shell-head-search"></div>'
-      + '</div>'
-      + '<div class="spa-shell-main">'
-        + '<div class="spa-shell-main-nav"></div>'
-        + '<div class="spa-shell-main-content"></div>'
-      + '</div>'
-      + '<div class="spa-shell-foot"></div>'
-      + '<div class="spa-shell-modal"></div>',
-  },
-  // 動的情報値
-  stateMap = { anchor_map  : {} },
-  // jQueryコレクションのキャッシュ
-  jqueryMap = {},
-  copyAnchorMap, setJqueryMap,
-  changeAnchorPart, onHashchange,
-  setChatAnchor, initModule;
+      anchor_shema_map : {
+          chat : { opened : true, closed : true }
+        },
+      main_html : String()
+        + '<div class="spa-shell-head">'
+          + '<div class="spa-shell-head-logo"></div>'
+          + '<div class="spa-shell-head-acct"></div>'
+          + '<div class="spa-shell-head-search"></div>'
+        + '</div>'
+        + '<div class="spa-shell-main">'
+          + '<div class="spa-shell-main-nav"></div>'
+          + '<div class="spa-shell-main-content"></div>'
+        + '</div>'
+        + '<div class="spa-shell-foot"></div>'
+        + '<div class="spa-shell-modal"></div>',
+      },
+    stateMap = { anchor_map  : {} },
+    jqueryMap = {},
+    copyAnchorMap, setJqueryMap,
+    changeAnchorPart, onHashchange,
+    setChatAnchor, initModule
+  ;
+  //--モジュール変数宣言-------------------------------------------------------
 
-  /*
-   * ユーティリティメッソッド
-   * 
-   */
+  //--ユーティリティメソッド開始------------------------------------------------------
   /**
    * 格納したアンカーマップのコピーを返す。オーバーヘッドを最小限にする。
    * @param なし
    * @return anchorMap
-   * @example tatoebadonnna
    */
   copyAnchorMap = function (){
     return $.extend(true, {}, stateMap.anchor_map);
   }
+  //--ユーティリティメソッド終了------------------------------------------------------
 
-  /**
-   * DOMメソッド
-   * 
-   */
+  //--DOMメソッド開始--------------------------------------------------------------
   //Begin setJqueryMap
   setJqueryMap = function() {
     var $container = stateMap.$container;
@@ -81,53 +68,55 @@ spa.shell = (function() {
     var
       anchor_map_revise = copyAnchorMap(),
       bool_return = true,
-      key_name, key_name_dep;
+      key_name, key_name_dep
+    ;
     //アンカーマップへの統合を開始
     KEYVAL:
-      for(key_name in arg_map){
-        if(arg_map.hasOwnProperty(key_name)){
-          //反復中に従属キーを飛ばす
-          if(key_name.indexOf('_')===0){continue KEYVAL;}
-          //独立キー値を更新する
-          anchor_map_revise[key_name] = arg_map[key_name];
-          //合致する独立キーを更新する
-          key_name_dep = '_' + key_name;
-          if( arg_map[key_name_dep]){
-            anchor_map_revise[key_name_dep] = arg_map[key_name_dep];
-          } else {
-            delete anchor_map_revise[key_name_dep];
-            delete anchor_map_revise['_s' + key_name_dep];
-          }
+    for( key_name in arg_map ){
+      if( arg_map.hasOwnProperty( key_name ) ){
+        //反復中に従属キーを飛ばす
+        if( key_name.indexOf( '_' )===0){ continue KEYVAL; }
+        //独立キー値を更新する
+        anchor_map_revise[key_name] = arg_map[key_name];
+        //合致する独立キーを更新する
+        key_name_dep = '_' + key_name;
+        if( arg_map[key_name_dep] ){
+          anchor_map_revise[key_name_dep] = arg_map[key_name_dep];
+        } else {
+          delete anchor_map_revise[key_name_dep];
+          delete anchor_map_revise['_s' + key_name_dep];
         }
       }
+    }
     
     //URIへの変更を開始
     try {
-      $.uriAnchor.setAnchor(anchor_map_revise);
+      $.uriAnchor.setAnchor( anchor_map_revise );
     }
-    catch(error){
-      $.uriAnchor.setAnchor(stateMap.anchor_map,null,true);
+    catch( error ){
+      $.uriAnchor.setAnchor( stateMap.anchor_map, null, true);
       bool_return = false;
     }
     return bool_return;
   };
   //End changeAnchorPart
-  
+  //--DOMメソッド終了---------------------------------------------------------
   
   //--イベントハンドラ開始------------------------------------------------------
   /**
    * onHashchange
    * 
    */
-  onHashchange = function(event){
+  onHashchange = function( event ){
     var
-      anchor_map_previous = copyAnchorMap(),
-      anchor_map_proposed,
       _s_chat_previous, _s_chat_proposed, s_chat_proposed,
+      anchor_map_proposed,
+      anchor_map_previous = copyAnchorMap(),
       is_ok = true
     ;
-    
+
     try{ anchor_map_proposed = $.uriAnchor.makeAnchorMap();}
+
     catch(error){
       $.uriAnchor.setAnchor(anchor_map_previous, null, true);
       return false;
@@ -137,7 +126,7 @@ spa.shell = (function() {
     _s_chat_previous = anchor_map_previous._s_chat;
     _s_chat_proposed = anchor_map_proposed._s_chat;
     
-    if(!anchor_map_previous || _s_chat_previous !== _s_chat_proposed){
+    if( ! anchor_map_previous || _s_chat_previous !== _s_chat_proposed){
       s_chat_proposed = anchor_map_proposed.chat;
       switch(s_chat_proposed){
       case 'opened':
@@ -149,7 +138,7 @@ spa.shell = (function() {
       default:
         spa.chat.setSliderPosition( 'closed' );
         delete anchor_map_proposed.chat;
-        $.uriAnchor.setAnchor( anchor_map_proposed, null, null );
+        $.uriAnchor.setAnchor( anchor_map_proposed, null, true );
       }
     }
     //スライダーの変更が拒否された場合
@@ -182,30 +171,26 @@ spa.shell = (function() {
   //--コールバック関数終了----------------------------------------------------
   
   //--パブリックメソッド開始---------------------------------------------------
-  //Begin initModule
-  //用例: spa.shell.initModule( $('#app_div_id') );
-  //目的: ユーザに機能を提供するようにチャットに指示する
-  //@param $append_target 1つのDOMコンテナを表すjQueryコレクション
-  //動作: $containerにUIのシェルを含め、機能モジュールを構成して初期化する。
-  //     シェルはURIアンカーやCookieの管理などのブラウザ全体に及ぶ問題を担当する。
-  //@return なし
-  //例外発行: なし
-  //
-  initModule = function($container) {
+  /**
+   * Begin initModule
+   * @param {jQueryコレクション}
+   * 用例: spa.shell.initModule( $('#app_div_id') );
+   * 目的: ユーザに機能を提供するようにチャットに指示する
+   * 動作: $containerにUIのシェルを含め、機能モジュールを構成して初期化する。
+   *      シェルはURIアンカーやCookieの管理などのブラウザ全体に及ぶ問題を担当する。
+   * 例外発行: なし
+   */
+  initModule = function( $container ) {
     //HTMLをロードしjQueryコレクションをマッピング
     stateMap.$container = $container;
-    $container.html(configMap.main_html);
+    $container.html( configMap.main_html );
     setJqueryMap();
-    
-//    stateMap.is_chat_retracted = true;
-//    jqueryMap.$chat
-//      .attr('title', configMap.chat_retracted_title)
-//      .click(onClickChat);
     
     //uriAnchorの初期値の読み込み
     $.uriAnchor.configModule({
-      schema_map : configMap.anchor_shema_map
+        schema_map : configMap.anchor_schema_map
     });
+    
 		//機能モジュールを構成して初期化する
 		spa.chat.configModule({
 		  set_chat_anchor : setChatAnchor,
@@ -218,14 +203,15 @@ spa.shell = (function() {
 		//これはすべての機能モジュールを構成して初期化した後に行う。
 		//そうしないと、トリガーイベントを処理できる状態にならない。
 		//トリガーイベントはアンカーがロード状態とみなせることを保証するために使う。
-    $(window).bind('hashchange',onHashchange).trigger('hashchange');
+    $(window)
+      .bind( 'hashchange', onHashchange )
+      .trigger( 'hashchange' );
   }
-  
   //End initModule
 
   // パブリックメソッドのエクスポート
   return {
     initModule : initModule
   };
-
+  //--パブリックメソッド終了---------------------------------------------------
 }());
