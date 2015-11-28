@@ -1,9 +1,9 @@
 /**
  * 
- *  spa.___.js
- *  [説明]モジュール 
+ *  spa.data.js
+ *  データモジュール 
  * @author Yuichiro SUGA
- * @since 
+ * @since 2015/11/26
  */
 
 /*
@@ -14,11 +14,11 @@
  * sloppy  :true,   vars      : false,  white : true
  */
 
-/* global $, spa */
-spa.___ = (function() {
+/* global $, saa */
+spa.data = (function() {
   //--Module Scope Variables BEGIN-------------------------------------------
   var
-    //Configuration properties mapping
+    //Configulation propetries mapping
     configMap = {
       main_html     : undefined,
       settable_map  : undefined
@@ -69,9 +69,9 @@ spa.___ = (function() {
   
   /**
    * initModule
-   * Append the function to a DOM element assigned by the argument, and fill
+   * Append the function to a DOM element asigned by the argument, and fill
    * it out with HTML contents.  After, initialise its properties and event
-   * handlers. Finally supply the UI to users on shell.
+   * handlers. Finaly supply the UI to users on shell.
    * @purpose Initialiser of this module
    * @param $append_target
    *    a jQquery collection to append this function on shell

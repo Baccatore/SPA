@@ -34,7 +34,7 @@ spa.shell = (function() {
         + '</div>'
         + '<div class="spa-shell-foot"></div>'
         + '<div class="spa-shell-modal"></div>',
-        resize_interval : 200
+      resize_interval : 200
     },
     stateMap = {
       $container  : undefined,
@@ -223,7 +223,7 @@ spa.shell = (function() {
 		//そうしないと、トリガーイベントを処理できる状態にならない。
 		//トリガーイベントはアンカーがロード状態とみなせることを保証するために使う。
     $(window)
-      .bind( 'resize', onResize())
+      .bind( 'resize', onResize )
       .bind( 'hashchange', onHashchange )
       .trigger( 'hashchange' );
   }

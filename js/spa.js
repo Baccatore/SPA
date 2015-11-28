@@ -12,11 +12,10 @@
 /*global $, spa:true */
 
 var spa = (function() {
-  /**
-   * パブリックメソッド
-   * 初期状態を設定し機能を提供する。
-   */
+  'use strict';
+  /** 初期状態を設定し機能を提供する。 */
   var initModule = function($container) {
+    spa.model.initModule();
     spa.shell.initModule($container);
   };
   //パブリックメソッドのエクスポート

@@ -46,7 +46,7 @@ spa.chat = (function(){
 				
 				slider_open_time  : 250,
 				slider_close_time : 250,
-				slider_opened_em  : 18,
+				slider_opened_em  : 16,
 				slider_closed_em  : 2,
 				slider_opened_title : 'Click to close',
 				slider_closed_title : 'Clicl to open',
@@ -106,10 +106,9 @@ spa.chat = (function(){
 	    window_height_em = Math.floor( 
 	        ( $(window).height() / px_per_em ) + 0.5
 	    );
-	    
 	    opened_height_em
 	      = window_height_em > configMap.window_height_min_em
-	      ? configMap.slider_open_em
+	      ? configMap.slider_opened_em
 	      : configMap.slider_opened_min_em;
 	    
 	    stateMap.px_per_em = px_per_em;
@@ -121,7 +120,6 @@ spa.chat = (function(){
 	};
 	//--DOMメソッド終了-----------------------------------------------------------
 	
-	/*
   //--パブリックイベント開始------------------------------------------------------
 	/**パブリックメソッド/setSliderPosition/開始
 	 * 用例: spa.chat.setSliderPosition( 'closed' );
@@ -292,10 +290,6 @@ spa.chat = (function(){
 	//--パブリックメソッド終了------------------------------------------------------
 	
 	return{
-	  /**
-	   * name
-	   * @method 
-	   */
 	  setSliderPosition : setSliderPosition,
 		configModule      : configModule,
 		initModule        : initModule,
