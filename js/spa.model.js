@@ -65,19 +65,66 @@ spa.model = (function() {
     configMap = {
       anon_id : 'a0'
     },
+    
     //State properties mapping
     stateMap = {
       anon_user       : null,
+      cid_serial      : 0,
       people_cid_map  : {},
-      people_db       : TAFFY()
+      people_db       : TAFFY(),
+      use             : null
     },
+    
+    //Flag for data flow control
     isFakeData = true,
-    personProto, makePerson, people,
-    /*configModule,*/ initModule
+    
+    //Loclal method and object
+    makeCid,      completeLogin,  clearPeopleDb,
+    personProto,  makePerson,     removePerson,
+    
+    //Exported method and object
+    people,       initModule
   ;
   //--Module Scope Variables END---------------------------------------------
 
   //--Utilities Method BEGIN-------------------------------------------------
+  /**
+   * makeCid
+   */
+  makeCid = function () {
+    return 'c' +String( stateMap.cid_serial++ );
+  };
+  
+  
+  /**
+   * clearPeopleDb
+   */
+  clearPeopleDb = function () {
+    var user = stateMap.user;
+    stateMap.people_db = TAFFY();
+    stateMap.people_cid_map = {};
+    if ( user ) {
+      stateMap.people_db.insert( user );
+      stateMap.people_cid_map[ user.cid ] = user;
+    };
+  }
+  
+  /**
+   * completeLogin
+   */
+  completeLogin = function ( user_list ) {
+    var user_map = user_list[ 0 ];
+    delete stateMap.people_cid_map[ user_map.cid ];
+    stateMap.user.cid     = user_map._id;
+    stateMap.user.id      = user_map._id;
+    stateMap.user.css_mao = user_map.css_map;
+    stateMap.people_cid_map[ user_map._id ] = stateMap.user;
+    
+    //should do it when join it to chat
+    $.gevent.publish( 'spa-login', [stateMap.user] );
+  };
+  
+  
   /**
    * personProto
    * @prototype
@@ -90,6 +137,7 @@ spa.model = (function() {
       return this.cid === stateMap.anon_user.cid;
     }
   };
+  
   /**
    * makePerson
    * @constructor
@@ -114,16 +162,73 @@ spa.model = (function() {
     stateMap.people_db.insert( person );
     return person;
   };
+  
+  /**
+   * removePerson
+   */
+  removePerson = function (person) {
+    if ( ! person ) { return false; }
+    
+    //Cannot remove anonymous user 
+    if ( person.id === configMap.anon_id ) { return false; }
+    
+    stateMap.people_db({ cid : person.cid }).remove();
+    if ( person.cid ) {
+      delete stateMap.people_cid_map[ person.cid ];
+    }
+    return true;
+  };
   //--Utilities Method END---------------------------------------------------
   
   //--Public Method BEGIN----------------------------------------------------
   /**
    * people object
+   * closure
    */
-  people = {
-    get_db      : function () { return stateMap.people_db; },
-    get_cid_map : function () { return stateMap.people_cid_map; }
-  };
+  people = (function () {
+    var get_by_cid, get_db, get_user, login, logout;
+    
+    get_by_cid = function ( cid ) {
+      return stateMap.people_cid_map [ cid ];
+    };
+    
+    get_db = function () { return stateMap.people_db; };
+    
+    get_user = function () { return stateMap.user; };
+    
+    login = function ( name ) {
+      var sio = isFakeData ?spa.fake.mockSio : spa.data.Sio();
+      stateMap.user = makePerson({
+        cid     : makeCid(),
+        css_map : { top : 25, left : 25, 'backgroun-color' : '#8f8' },
+        name    : name
+      });
+      sio.on( 'userupdate', completeLogin );
+      sio.emit( 'adduser', {
+        cid     : stateMap.user.cid,
+        css_map : stateMap.user.css_map,
+        name    : stateMap.user.name
+      });
+    } 
+    
+    logout = function () {
+      var is_removed, user = stateMap.user;
+      
+      is_removed = removePerson( user );
+      stateMap.user = stateMap.anon_user;
+      $.gevent.publish( 'spa-logout', [ user ] );
+      return is_removed;
+      
+    }
+    
+    return {
+      get_by_cid  : get_by_cid,
+      get_db      : get_db,
+      get_user    : get_user,
+      login       : login,
+      logout      : logout
+    }
+  }());
   /**
    * initModule
    * @purpose Initialiser of this model
