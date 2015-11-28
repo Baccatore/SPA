@@ -16,6 +16,7 @@
 
 /** global $, saa */
 spa.shell = (function() {
+  'use strict';
   //--モジュール変数宣言-------------------------------------------------------
   var
     configMap = {
@@ -24,9 +25,11 @@ spa.shell = (function() {
         },
       main_html : String()
         + '<div class="spa-shell-head">'
-          + '<div class="spa-shell-head-logo"></div>'
+          + '<div class="spa-shell-head-logo">'
+            +'<h1>COMPASS</h1>'
+            +'<p>COmmon MutltiPurpose Association System for Samaritan</p>'
+          + '</div>'
           + '<div class="spa-shell-head-acct"></div>'
-          + '<div class="spa-shell-head-search"></div>'
         + '</div>'
         + '<div class="spa-shell-main">'
           + '<div class="spa-shell-main-nav"></div>'
@@ -42,8 +45,9 @@ spa.shell = (function() {
       resize_idto : undefined
     },
     jqueryMap = {},
-    copyAnchorMap, setJqueryMap,
-    changeAnchorPart, onHashchange,
+    copyAnchorMap, setJqueryMap,  changeAnchorPart,
+    onHashchange,  onResize,      onTapAcct, 
+    onLogin,       onLogout,
     setChatAnchor, initModule
   ;
   //--モジュール変数宣言-------------------------------------------------------
@@ -64,7 +68,11 @@ spa.shell = (function() {
   setJqueryMap = function() {
     var $container = stateMap.$container;
     // jQueryコレクションのキャッシュ
-    jqueryMap = { $container : $container };
+    jqueryMap = {
+        $container  : $container,
+        $acct       : $container.find('.spa-shell-head-acct'),
+        $nav        : $container.find('.spa-shell-main-nav')
+    };
   };
   //End setJqueryMap
   
@@ -110,7 +118,6 @@ spa.shell = (function() {
   //--イベントハンドラ開始------------------------------------------------------
   /**
    * onHashchange
-   * 
    */
   onHashchange = function( event ){
     var
@@ -160,7 +167,9 @@ spa.shell = (function() {
   }
   //End onHashchange
   
-  //Event handler/onResize/BEGIN
+  /**
+   * onResize
+   */
   onResize = function () {
     if ( stateMap.resize_idto ){ return true; }
     spa.chat.handleResize();
@@ -171,6 +180,36 @@ spa.shell = (function() {
      return true; //jQueryがpereventEventやstopPropagationを実行しないように指示
   }
   //Event handler/onResize/END
+  
+  /**
+   * onTapAcct
+   */
+  onTapAcct = function ( event ) {
+    var acct_text, user_name, user = spa.model.people.get_user();
+    
+    if ( user.get_is_anon() ) {
+      user_name = prompt( 'Please sign-in ');
+      spa.model.people.login( user_name );
+      jqueryMap.$acct.text('...processing...');
+    } else {
+      spa.model.people.logout();
+    }
+    return false;
+  };
+  
+  /**
+   * onLogin
+   */
+  onLogin = function ( event, login_user ) {
+    jqueryMap.$acct.text( login_user.name );
+  }
+  
+  /**
+   * onLogout
+   */
+  onLogout = function ( event, logout_user ) {
+    jqueryMap.$acct.text( 'Please sign-in' );
+  }
   //--イベントハンドラ終了------------------------------------------------------
   
   
@@ -222,16 +261,20 @@ spa.shell = (function() {
 		//これはすべての機能モジュールを構成して初期化した後に行う。
 		//そうしないと、トリガーイベントを処理できる状態にならない。
 		//トリガーイベントはアンカーがロード状態とみなせることを保証するために使う。
+		$.gevent.subscribe( $container, 'spa-login',  onLogin );
+		$.gevent.subscribe( $container, 'spa-logout', onLogout );
+		
     $(window)
       .bind( 'resize', onResize )
       .bind( 'hashchange', onHashchange )
       .trigger( 'hashchange' );
+    jqueryMap.$acct
+      .text( 'Please sign-in')
+      .bind( 'utap', onTapAcct );
   }
   //End initModule
 
   // パブリックメソッドのエクスポート
-  return {
-    initModule : initModule
-  };
+  return { initModule : initModule };
   //--パブリックメソッド終了---------------------------------------------------
 }());
